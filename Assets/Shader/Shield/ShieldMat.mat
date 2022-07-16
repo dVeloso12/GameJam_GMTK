@@ -50,7 +50,7 @@ Material:
     m_Floats:
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _ShieldPower: 4
+    - _ShieldPower: 0.71
     m_Colors:
     - _ShieldColor: {r: 0.08130116, g: 0.52208084, b: 0.5943396, a: 0}
   m_BuildTextureStacks: []
