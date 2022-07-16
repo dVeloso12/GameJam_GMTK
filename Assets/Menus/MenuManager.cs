@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Audio;
+using UnityEngine.UI;
+
 
 public enum StateToUpdate { NULL,MainMenu_Options, Options_MainMenu, MainMenu_Credits, Credits_MainMenu }
 public class MenuManager : MonoBehaviour
@@ -9,6 +12,7 @@ public class MenuManager : MonoBehaviour
     [Header("General")]
     [SerializeField] private float Speed = 2f;
 
+    [Header("FadeIN/Out Stuff")]
     [Header("MainMenu")]
     [SerializeField] private GameObject MainMenu;
     [Header("Options")]
@@ -16,18 +20,26 @@ public class MenuManager : MonoBehaviour
     [Header("Credits")]
     [SerializeField] private GameObject Credits;
 
+    [Header("Settings Stuff")]
+    [SerializeField] AudioMixer Mixer;
+    [SerializeField] TMPro.TMP_Dropdown Dropdown_Resolutions;
+
     private bool _FadeIn, _FadeOut;
     public StateToUpdate state;
-    private bool CanUpdate;
+    Resolution[] resolutions;
+
     private void Start()
     {
         state = StateToUpdate.NULL;
+        getResolutions();
     }
     private void Update()
     {
 
         UpdateState();
     }
+
+    #region MenusState
     void UpdateState()
     {
         if(state == StateToUpdate.MainMenu_Options)
@@ -84,7 +96,7 @@ public class MenuManager : MonoBehaviour
     }
     public void Play()
     {
-        SceneManager.LoadScene("GameMap", LoadSceneMode.Additive);
+        SceneManager.LoadScene("GameMap", LoadSceneMode.Single);
         Debug.Log("Play");
     }
 
@@ -116,6 +128,50 @@ public class MenuManager : MonoBehaviour
             }
         } 
     }
- 
+    #endregion
+    #region Settings
+    void getResolutions()
+    {
+        resolutions = Screen.resolutions;
+
+        Dropdown_Resolutions.ClearOptions();
+
+        int currentRes = 0;
+        List<string> op = new List<string>();
+        for(int i = 0; i < resolutions.Length; i++)
+        {
+            string option = resolutions[i].width + " x " + resolutions[i].height;
+            op.Add(option);
+
+            if(resolutions[i].width == Screen.currentResolution.width &&
+                resolutions[i].height == Screen.currentResolution.height)
+            {
+                currentRes = i;
+            }
+        }
+        Dropdown_Resolutions.AddOptions(op);
+        Dropdown_Resolutions.value = currentRes;
+        Dropdown_Resolutions.RefreshShownValue();
+
+    }
+    public void SetVolume(float volume)
+    {
+        Mixer.SetFloat("volume", volume);
+    }
+    public void SetQuality(int index)
+    {
+        Debug.Log(index);
+        QualitySettings.SetQualityLevel(index);
+    }
+    public void SetFullscreen(bool isFull)
+    {
+        Screen.fullScreen = isFull;
+    }
+    public void SetResolution(int index)
+    {
+        Resolution res = resolutions[index];
+        Screen.SetResolution(res.width, res.height, Screen.fullScreen);
+    }
+    #endregion
 
 }
